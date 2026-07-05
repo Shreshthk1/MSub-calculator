@@ -1,4 +1,6 @@
+import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
+import App from './App'
 import { calculateLease } from './lib/lease'
 
 describe('calculateLease', () => {
@@ -34,5 +36,16 @@ describe('calculateLease', () => {
     expect(result.monthlyLease).toBeCloseTo(29.166666, 5)
     expect(result.adminFeeMonthly).toBe(0)
     expect(result.monthlyPayment).toBeCloseTo(29.166666, 5)
+  })
+
+  it('shows total savings when the 36-month total is less than the laptop price', () => {
+    render(<App />)
+
+    expect(screen.getByText(/total savings/i)).toBeInTheDocument()
+
+    const laptopPriceInput = screen.getByRole('spinbutton', { name: /laptop price/i })
+    fireEvent.change(laptopPriceInput, { target: { value: '300' } })
+
+    expect(screen.queryByText(/total savings/i)).not.toBeInTheDocument()
   })
 })

@@ -162,7 +162,7 @@ function App() {
         </header>
 
         <main className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
-          <section className="rounded-[2rem] border border-slate-800 bg-slate-900/70 p-8 shadow-xl shadow-black/20 backdrop-blur">
+          <section className="order-2 rounded-[2rem] border border-slate-800 bg-slate-900/70 p-8 shadow-xl shadow-black/20 backdrop-blur lg:order-none">
             <h2 className="text-2xl font-semibold">Lease breakdown</h2>
             <p className="mt-2 text-slate-400">
               The monthly lease is based on the laptop price minus the KTT, spread evenly across 36 months. The admin fee is the only extra cost, and the warranty is shown as a monthly equivalent when selected.
@@ -206,11 +206,17 @@ function App() {
                   <span>Total cost over 36 months</span>
                   <span>{currency.format(lease.totalLeaseCost)}</span>
                 </div>
+                {lease.totalLeaseCost < Number(form.laptopPrice) ? (
+                  <div className="flex items-center justify-between text-sm text-emerald-300">
+                    <span>Total savings</span>
+                    <span>{currency.format(Number(form.laptopPrice) - lease.totalLeaseCost)}</span>
+                  </div>
+                ) : null}
               </div>
             </div>
           </section>
 
-          <section className="rounded-[2rem] border border-slate-800 bg-slate-900/70 p-8 shadow-xl shadow-black/20 backdrop-blur">
+          <section className="order-1 rounded-[2rem] border border-slate-800 bg-slate-900/70 p-8 shadow-xl shadow-black/20 backdrop-blur lg:order-none">
             <h2 className="text-2xl font-semibold">Adjust your terms</h2>
             <div className="mt-6 grid gap-4">
               <InputField
