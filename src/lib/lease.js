@@ -32,11 +32,19 @@ export function calculateLease({
   const kttAmount = getKttAmount(price, deviceType)
   const financedAmount = Math.max(0, price - kttAmount)
   const monthlyLease = financedAmount / months
-  const adminFeeMonthly = isMember ? 0 : toNumber(adminFee) / months
-  // protectionCost is the full term cost; show monthly equivalent (3 years)
-  const protectionMonthly = protectionPlan === 'none' ? 0 : toNumber(protectionCost) / 36
+  const waivesAdminFee = isMember || protectionPlan === 'bbpplus'
+  const adminFeeMonthly = waivesAdminFee ? 0 : toNumber(adminFee) / months
+  const protectionMonthly =
+    protectionPlan === 'none'
+      ? 0
+      : protectionPlan === 'bbpplus'
+        ? toNumber(protectionCost)
+        : toNumber(protectionCost) / 36
   const monthlyPayment = monthlyLease + adminFeeMonthly + protectionMonthly
-  const totalLeaseCost = monthlyLease * months + (isMember ? 0 : toNumber(adminFee)) + toNumber(protectionCost)
+  const totalLeaseCost =
+    monthlyLease * months +
+    (waivesAdminFee ? 0 : toNumber(adminFee)) +
+    (protectionPlan === 'bbpplus' ? toNumber(protectionCost) : toNumber(protectionCost))
 
   return {
     deviceType,

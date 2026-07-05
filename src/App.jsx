@@ -4,7 +4,8 @@ import { calculateLease } from './lib/lease'
 const currency = new Intl.NumberFormat('en-CA', {
   style: 'currency',
   currency: 'CAD',
-  maximumFractionDigits: 0,
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
 })
 
 function InputField({ label, value, onChange, min = 0, step = 1, suffix, type = 'number' }) {
@@ -108,7 +109,7 @@ function App() {
     setForm((previous) => ({
       ...previous,
       protectionPlan: nextPlan,
-      protectionCost: nextPlan === 'none' ? 0 : previous.protectionCost || (nextPlan === 'bbpplus' ? 12 : 15),
+      protectionCost: nextPlan === 'none' ? 0 : previous.protectionCost || 15,
     }))
   }
 
@@ -194,7 +195,11 @@ function App() {
                   <span>{currency.format(lease.adminFeeMonthly)}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span>Protection plan monthly equivalent</span>
+                  <span>
+                    {form.protectionPlan === 'bbpplus'
+                      ? 'BBP+ '
+                      : 'Protection plan monthly equivalent'}
+                  </span>
                   <span>{currency.format(lease.protectionMonthly)}</span>
                 </div>
                 <div className="flex items-center justify-between border-t border-slate-800 pt-3 text-base font-semibold text-white">
@@ -262,7 +267,7 @@ function App() {
 
               {form.protectionPlan !== 'none' ? (
                 <InputField
-                  label="Monthly protection cost"
+                  label={form.protectionPlan === 'bbppd' ? 'Full Protection cost' : 'Monthly protection cost'}
                   value={form.protectionCost}
                   onChange={handleChange('protectionCost')}
                   min="0"

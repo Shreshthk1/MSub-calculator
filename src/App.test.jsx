@@ -2,6 +2,21 @@ import { describe, expect, it } from 'vitest'
 import { calculateLease } from './lib/lease'
 
 describe('calculateLease', () => {
+  it('uses the entered protection cost for BBP+ while showing it as a first-year charge', () => {
+    const result = calculateLease({
+      laptopPrice: 1200,
+      deviceType: 'pc',
+      termMonths: 36,
+      adminFee: 130,
+      isMember: false,
+      protectionPlan: 'bbpplus',
+      protectionCost: 39,
+    })
+
+    expect(result.protectionMonthly).toBe(39)
+    expect(result.totalLeaseCost).toBeCloseTo(1050 + 39, 5)
+  })
+
   it('splits the lease amount over 36 months and waives the admin fee for members', () => {
     const result = calculateLease({
       laptopPrice: 1200,
