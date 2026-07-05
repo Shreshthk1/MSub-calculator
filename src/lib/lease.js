@@ -40,11 +40,14 @@ export function calculateLease({
       : protectionPlan === 'bbpplus'
         ? toNumber(protectionCost)
         : toNumber(protectionCost) / 36
-  const monthlyPayment = monthlyLease + adminFeeMonthly + protectionMonthly
+  const monthlySubtotal = monthlyLease + adminFeeMonthly + protectionMonthly
+  const taxAmount = monthlySubtotal * 0.05
+  const monthlyPayment = monthlySubtotal + taxAmount
   const totalLeaseCost =
     monthlyLease * months +
     (waivesAdminFee ? 0 : toNumber(adminFee)) +
     (protectionPlan === 'bbpplus' ? toNumber(protectionCost) : toNumber(protectionCost))
+  const totalWithTax = totalLeaseCost * 1.05
 
   return {
     deviceType,
@@ -52,8 +55,11 @@ export function calculateLease({
     financedAmount,
     monthlyLease,
     adminFeeMonthly,
+    monthlySubtotal,
+    taxAmount,
     monthlyPayment,
     totalLeaseCost,
+    totalWithTax,
     protectionMonthly,
     termMonths: months,
   }

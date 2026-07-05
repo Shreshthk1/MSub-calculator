@@ -157,6 +157,7 @@ function App() {
             <div className="rounded-2xl border border-cyan-400/20 bg-cyan-400/10 px-5 py-4 text-cyan-100">
               <p className="text-sm text-cyan-200">Estimated monthly payment</p>
               <p className="mt-2 text-3xl font-semibold">{currency.format(lease.monthlyPayment)}</p>
+              <p className="mt-1 text-sm text-cyan-100/80">Includes 5% tax</p>
             </div>
           </div>
         </header>
@@ -165,7 +166,7 @@ function App() {
           <section className="order-2 rounded-[2rem] border border-slate-800 bg-slate-900/70 p-8 shadow-xl shadow-black/20 backdrop-blur lg:order-none">
             <h2 className="text-2xl font-semibold">Lease breakdown</h2>
             <p className="mt-2 text-slate-400">
-              The monthly lease is based on the laptop price minus the KTT, spread evenly across 36 months. The admin fee is the only extra cost, and the warranty is shown as a monthly equivalent when selected.
+              The monthly lease is based on the laptop price minus the KTT, spread evenly across 36 months. The admin fee is the only extra cost, and the warranty is shown as a monthly equivalent when selected. The displayed monthly payment includes 5% tax.
             </p>
 
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -179,7 +180,7 @@ function App() {
             <div className="mt-6 rounded-3xl border border-slate-800 bg-slate-950/80 p-6">
               <div className="flex items-baseline justify-between">
                 <span className="text-sm font-medium uppercase tracking-[0.25em] text-slate-400">
-                  Monthly payment
+                  Monthly payment (includes 5% tax)
                 </span>
                 <span className="text-4xl font-semibold text-cyan-300">
                   {currency.format(lease.monthlyPayment)}
@@ -202,9 +203,13 @@ function App() {
                   </span>
                   <span>{currency.format(lease.protectionMonthly)}</span>
                 </div>
+                <div className="flex items-center justify-between">
+                  <span>Tax (5%)</span>
+                  <span>{currency.format(lease.taxAmount)}</span>
+                </div>
                 <div className="flex items-center justify-between border-t border-slate-800 pt-3 text-base font-semibold text-white">
                   <span>Total cost over 36 months</span>
-                  <span>{currency.format(lease.totalLeaseCost)}</span>
+                  <span>{currency.format(lease.totalWithTax)}</span>
                 </div>
                 {lease.totalLeaseCost < Number(form.laptopPrice) ? (
                   <div className="flex items-center justify-between text-sm text-emerald-300">
