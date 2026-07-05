@@ -38,6 +38,21 @@ describe('calculateLease', () => {
     expect(result.monthlyPayment).toBeCloseTo(29.166666, 5)
   })
 
+  it('includes 5% tax in the monthly payment', () => {
+    const result = calculateLease({
+      laptopPrice: 1200,
+      deviceType: 'pc',
+      termMonths: 36,
+      adminFee: 130,
+      isMember: false,
+      protectionPlan: 'none',
+      protectionCost: 0,
+    })
+
+    const subtotal = result.monthlyLease + result.adminFeeMonthly + result.protectionMonthly
+    expect(result.monthlyPayment).toBeCloseTo(subtotal * 1.05, 5)
+  })
+
   it('shows total savings when the 36-month total is less than the laptop price', () => {
     render(<App />)
 
