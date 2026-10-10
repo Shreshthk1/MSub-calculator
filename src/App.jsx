@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { calculateLease } from './lib/lease'
+import { DEFAULT_ADMIN_FEES, KTT_TABLES, calculateLease } from './lib/lease'
 
 const currency = new Intl.NumberFormat('en-CA', {
   style: 'currency',
@@ -36,10 +36,76 @@ function MetricCard({ title, value, accent = 'text-white' }) {
   )
 }
 
+const KTT_SECTIONS = [
+  {
+    title: 'Laptops',
+    columns: [
+      { key: 'pc', label: 'PC Laptops' },
+      { key: 'mac', label: 'Apple MacBook' },
+    ],
+  },
+  {
+    title: 'Mobile (36 months)',
+    columns: [
+      { key: 'mobile-apple', label: 'Apple' },
+      { key: 'mobile-samsung', label: 'Samsung' },
+      { key: 'mobile-google', label: 'Google' },
+    ],
+  },
+  {
+    title: 'Smart Watch (36 months)',
+    columns: [
+      { key: 'watch-apple', label: 'Apple' },
+      { key: 'watch-samsung', label: 'Samsung' },
+    ],
+  },
+]
+
+function formatBand(minimum, nextMinimum) {
+  const low = minimum.toLocaleString('en-CA')
+  if (nextMinimum === undefined) return `$${low}+`
+  return `$${low} - ${(nextMinimum - 0.01).toLocaleString('en-CA', { minimumFractionDigits: 2 })}`
+}
+
+function KttTable({ title, columns }) {
+  // All columns in a section share the same price bands; read them from the first.
+  const minimums = KTT_TABLES[columns[0].key].map(([minimum]) => minimum).reverse()
+
+  return (
+    <div className="mt-5">
+      <h4 className="text-sm font-semibold uppercase tracking-wider text-cyan-300">{title}</h4>
+      <table className="mt-2 w-full text-sm">
+        <thead>
+          <tr className="text-left text-slate-300">
+            <th className="pb-2 pr-6">Price Band</th>
+            {columns.map((column) => (
+              <th key={column.key} className="pb-2 pr-6">
+                {column.label} KTT
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-slate-800 text-slate-200">
+          {minimums.map((minimum, index) => (
+            <tr key={minimum}>
+              <td className="py-2 pr-6">{formatBand(minimum, minimums[index + 1])}</td>
+              {columns.map((column) => (
+                <td key={column.key} className="py-2 pr-6">
+                  ${KTT_TABLES[column.key].find(([m]) => m === minimum)[1]}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
 function KttInfo({ onClose }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-      <div className="relative w-full max-w-2xl rounded-lg bg-slate-900 p-6 text-slate-100 shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+      <div className="relative max-h-[90vh] w-full max-w-3xl overflow-auto rounded-lg bg-slate-900 p-6 text-slate-100 shadow-2xl">
         <button
           onClick={onClose}
           aria-label="Close KTT info"
@@ -49,40 +115,15 @@ function KttInfo({ onClose }) {
         </button>
 
         <h3 className="text-lg font-semibold">Important KTT Amount Details</h3>
-        <p className="mt-2 text-sm text-slate-400">KTT is applied based on the price band and device type.</p>
+        <p className="mt-2 text-sm text-slate-400">
+          KTT is applied based on the price band and device type. Devices below the lowest band are not eligible.
+          Mobile and smart watch admin fee is $129.99 ($0 for members).
+        </p>
 
-        <div className="mt-4 overflow-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left text-slate-300">
-                <th className="pb-3 pr-6">Price Band</th>
-                <th className="pb-3 pr-6">PC Laptops - KTT Amount</th>
-                <th className="pb-3">Apple MacBook - KTT Amount</th>
-              </tr>
-            </thead>
-            <tbody className="mt-2 divide-y divide-slate-800 text-slate-200">
-              <tr>
-                <td className="py-3">$0 - 499.99</td>
-                <td className="py-3">Not available</td>
-                <td className="py-3">Not available</td>
-              </tr>
-              <tr>
-                <td className="py-3">$500 - 1499.99</td>
-                <td className="py-3">$150</td>
-                <td className="py-3">$400</td>
-              </tr>
-              <tr>
-                <td className="py-3">$1500 - 1999.99</td>
-                <td className="py-3">$200</td>
-                <td className="py-3">$500</td>
-              </tr>
-              <tr>
-                <td className="py-3">$2000+</td>
-                <td className="py-3">$200</td>
-                <td className="py-3">$600</td>
-              </tr>
-            </tbody>
-          </table>
+        <div className="overflow-x-auto">
+          {KTT_SECTIONS.map((section) => (
+            <KttTable key={section.title} {...section} />
+          ))}
         </div>
       </div>
     </div>
@@ -109,7 +150,8 @@ function App() {
     setForm((previous) => ({
       ...previous,
       protectionPlan: nextPlan,
-      protectionCost: nextPlan === 'none' ? 0 : previous.protectionCost || 15,
+      protectionCost:
+        nextPlan === 'none' ? 0 : nextPlan === 'bbpplus' ? 26 : previous.protectionCost || 15,
     }))
   }
 
@@ -151,7 +193,7 @@ function App() {
                 </button>
               </div>
               <p className="mt-4 text-lg text-slate-300">
-                This view follows the Msub model: the KTT is removed from the laptop price, the remaining amount is spread over 36 months, and the admin fee is the only finance charge. Warranty coverage is shown as a monthly equivalent even when it is paid in full upfront.
+                This view follows the Msub model: the KTT is removed from the device price, the remaining amount is spread over 36 months, and the admin fee is the only finance charge. Warranty coverage is shown as a monthly equivalent even when it is paid in full upfront.
               </p>
             </div>
             <div className="rounded-2xl border border-cyan-400/20 bg-cyan-400/10 px-5 py-4 text-cyan-100">
@@ -166,11 +208,11 @@ function App() {
           <section className="order-2 rounded-[2rem] border border-slate-800 bg-slate-900/70 p-8 shadow-xl shadow-black/20 backdrop-blur lg:order-none">
             <h2 className="text-2xl font-semibold">Lease breakdown</h2>
             <p className="mt-2 text-slate-400">
-              The monthly lease is based on the laptop price minus the KTT, spread evenly across 36 months. The admin fee is the only extra cost, and the warranty is shown as a monthly equivalent when selected. The displayed monthly payment includes 5% tax.
+              The monthly lease is based on the device price minus the KTT, spread evenly across 36 months. The admin fee is the only extra cost, and the warranty is shown as a monthly equivalent when selected. The displayed monthly payment includes 5% tax.
             </p>
 
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              <MetricCard title="Laptop price" value={currency.format(Number(form.laptopPrice) || 0)} />
+              <MetricCard title="Device price" value={currency.format(Number(form.laptopPrice) || 0)} />
               <MetricCard title="KTT amount" value={currency.format(lease.kttAmount)} />
               <MetricCard title="Price after KTT" value={currency.format(lease.financedAmount)} />
               <MetricCard title="Monthly lease" value={currency.format(lease.monthlyLease)} accent="text-cyan-300" />
@@ -225,7 +267,7 @@ function App() {
             <h2 className="text-2xl font-semibold">Adjust your terms</h2>
             <div className="mt-6 grid gap-4">
               <InputField
-                label="Laptop price"
+                label="Device price"
                 value={form.laptopPrice}
                 onChange={handleChange('laptopPrice')}
                 min="0"
@@ -236,11 +278,28 @@ function App() {
                 <span className="mb-2 block text-sm font-medium text-slate-300">Device type</span>
                 <select
                   value={form.deviceType}
-                  onChange={(e) => setForm((p) => ({ ...p, deviceType: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((p) => ({
+                      ...p,
+                      deviceType: e.target.value,
+                      adminFee: DEFAULT_ADMIN_FEES[e.target.value],
+                    }))
+                  }
                   className="w-full rounded-2xl border border-slate-700 bg-slate-900/70 px-4 py-3 text-white outline-none"
                 >
-                  <option value="pc">PC Laptop</option>
-                  <option value="mac">Apple MacBook</option>
+                  <optgroup label="Laptop">
+                    <option value="pc">PC Laptop</option>
+                    <option value="mac">Apple MacBook</option>
+                  </optgroup>
+                  <optgroup label="Mobile">
+                    <option value="mobile-apple">Apple iPhone</option>
+                    <option value="mobile-samsung">Samsung phone</option>
+                    <option value="mobile-google">Google Pixel</option>
+                  </optgroup>
+                  <optgroup label="Smart Watch">
+                    <option value="watch-apple">Apple Watch</option>
+                    <option value="watch-samsung">Samsung watch</option>
+                  </optgroup>
                 </select>
               </label>
               {/* KTT percentage removed — KTT is determined from device type and price */}

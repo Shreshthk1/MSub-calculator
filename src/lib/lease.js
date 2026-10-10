@@ -2,20 +2,33 @@ function toNumber(value) {
   const parsed = Number(value)
   return Number.isFinite(parsed) ? parsed : 0
 }
-function getKttAmount(price, deviceType) {
+// KTT tiers: [minimum price, KTT amount], highest band first.
+// Devices priced below the lowest band are not eligible for KTT.
+export const KTT_TABLES = {
+  pc: [[2000, 200], [1500, 200], [500, 150]],
+  mac: [[2000, 600], [1500, 500], [500, 400]],
+  'mobile-apple': [[2500, 600], [2000, 600], [1750, 500], [1500, 400], [1250, 350], [1000, 300], [750, 200]],
+  'mobile-samsung': [[2500, 400], [2000, 350], [1750, 300], [1500, 250], [1250, 200], [1000, 150], [750, 100]],
+  'mobile-google': [[2500, 400], [2000, 350], [1750, 300], [1500, 250], [1250, 200], [1000, 150], [750, 100]],
+  'watch-apple': [[1000, 250], [750, 150], [500, 100]],
+  'watch-samsung': [[1000, 250], [750, 150], [500, 100]],
+}
+
+export const DEFAULT_ADMIN_FEES = {
+  pc: 130,
+  mac: 130,
+  'mobile-apple': 129.99,
+  'mobile-samsung': 129.99,
+  'mobile-google': 129.99,
+  'watch-apple': 129.99,
+  'watch-samsung': 129.99,
+}
+
+export function getKttAmount(price, deviceType) {
   const p = toNumber(price)
-  if (p < 500) return 0
-
-  if (deviceType === 'mac') {
-    if (p >= 500 && p < 1500) return 400
-    if (p >= 1500 && p < 2000) return 500
-    return 600
-  }
-
-  // default: PC laptop
-  if (p >= 500 && p < 1500) return 150
-  if (p >= 1500 && p < 2000) return 200
-  return 200
+  const table = KTT_TABLES[deviceType] ?? KTT_TABLES.pc
+  const band = table.find(([minimum]) => p >= minimum)
+  return band ? band[1] : 0
 }
 
 export function calculateLease({
