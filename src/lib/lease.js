@@ -57,7 +57,8 @@ export function calculateLease({
   const totalLeaseCost =
     monthlyLease * months +
     (waivesAdminFee ? 0 : toNumber(adminFee)) +
-    (protectionPlan === 'bbpplus' ? toNumber(protectionCost) : toNumber(protectionCost))
+    // BBP+ is monthly and cancelable after a year, so only the first 12 months are counted.
+    (protectionPlan === 'bbpplus' ? toNumber(protectionCost) * 12 : toNumber(protectionCost))
   const totalWithTax = totalLeaseCost * 1.05
 
   return {

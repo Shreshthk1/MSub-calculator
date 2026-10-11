@@ -16,7 +16,7 @@ describe('calculateLease', () => {
     })
 
     expect(result.protectionMonthly).toBe(39)
-    expect(result.totalLeaseCost).toBeCloseTo(1050 + 39, 5)
+    expect(result.totalLeaseCost).toBeCloseTo(1050 + 39 * 12, 5)
   })
 
   it('splits the lease amount over 36 months and waives the admin fee for members', () => {
@@ -81,11 +81,11 @@ describe('calculateLease', () => {
   it('shows total savings when the 36-month total is less than the laptop price', () => {
     render(<App />)
 
-    expect(screen.getByText(/total savings/i)).toBeInTheDocument()
+    expect(screen.getByText(/savings vs\. buying outright/i)).toBeInTheDocument()
 
     const laptopPriceInput = screen.getByRole('spinbutton', { name: /device price/i })
     fireEvent.change(laptopPriceInput, { target: { value: '300' } })
 
-    expect(screen.queryByText(/total savings/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/savings vs\. buying outright/i)).not.toBeInTheDocument()
   })
 })

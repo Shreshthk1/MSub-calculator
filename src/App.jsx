@@ -269,13 +269,17 @@ function App() {
                   <span>{currency.format(lease.taxAmount)}</span>
                 </div>
                 <div className="flex items-center justify-between border-t border-slate-800 pt-3 text-base font-semibold text-white">
-                  <span>Total cost over 36 months</span>
+                  <span>
+                    {form.protectionPlan === 'bbpplus'
+                      ? 'Total cost over 36 months (BBP+ first year only)'
+                      : 'Total cost over 36 months'}
+                  </span>
                   <span>{currency.format(lease.totalWithTax)}</span>
                 </div>
-                {lease.totalLeaseCost < Number(form.laptopPrice) ? (
+                {lease.totalWithTax < Number(form.laptopPrice) * 1.05 ? (
                   <div className="flex items-center justify-between text-sm text-emerald-300">
-                    <span>Total savings</span>
-                    <span>{currency.format(Number(form.laptopPrice) - lease.totalLeaseCost)}</span>
+                    <span>Savings vs. buying outright</span>
+                    <span>{currency.format(Number(form.laptopPrice) * 1.05 - lease.totalWithTax)}</span>
                   </div>
                 ) : null}
               </div>
