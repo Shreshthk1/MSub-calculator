@@ -65,6 +65,19 @@ describe('calculateLease', () => {
     expect(getKttAmount(1100, 'watch-apple')).toBe(250)
   })
 
+  it('applies laptop, desktop and tablet KTT by brand and price band', () => {
+    expect(getKttAmount(999.99, 'mac')).toBe(200)
+    expect(getKttAmount(1699.99, 'mac')).toBe(500)
+    expect(getKttAmount(1799.99, 'pc')).toBe(200)
+    expect(getKttAmount(1499.99, 'pc')).toBe(150)
+    expect(getKttAmount(1600, 'desktop-pc')).toBe(250)
+    expect(getKttAmount(2100, 'desktop-apple')).toBe(500)
+    expect(getKttAmount(499.99, 'tablet-ipad')).toBe(0)
+    expect(getKttAmount(1200, 'tablet-ipad')).toBe(300)
+    expect(getKttAmount(2500, 'tablet-samsung')).toBe(350)
+    expect(getKttAmount(1999.99, 'tablet-surface')).toBe(200)
+  })
+
   it('shows total savings when the 36-month total is less than the laptop price', () => {
     render(<App />)
 

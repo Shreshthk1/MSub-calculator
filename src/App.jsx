@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { DEFAULT_ADMIN_FEES, KTT_TABLES, calculateLease } from './lib/lease'
+import { ADMIN_FEE, KTT_TABLES, calculateLease } from './lib/lease'
 
 const currency = new Intl.NumberFormat('en-CA', {
   style: 'currency',
@@ -42,6 +42,21 @@ const KTT_SECTIONS = [
     columns: [
       { key: 'pc', label: 'PC Laptops' },
       { key: 'mac', label: 'Apple MacBook' },
+    ],
+  },
+  {
+    title: 'Desktops',
+    columns: [
+      { key: 'desktop-pc', label: 'PC Desktops' },
+      { key: 'desktop-apple', label: 'Apple Desktops' },
+    ],
+  },
+  {
+    title: 'Tablets',
+    columns: [
+      { key: 'tablet-surface', label: 'Microsoft Surface' },
+      { key: 'tablet-samsung', label: 'Samsung Galaxy' },
+      { key: 'tablet-ipad', label: 'Apple iPad' },
     ],
   },
   {
@@ -117,7 +132,11 @@ function KttInfo({ onClose }) {
         <h3 className="text-lg font-semibold">Important KTT Amount Details</h3>
         <p className="mt-2 text-sm text-slate-400">
           KTT is applied based on the price band and device type. Devices below the lowest band are not eligible.
-          Mobile and smart watch admin fee is $129.99 ($0 for members).
+          Admin fee is $129.99 ($0 for members).
+        </p>
+        <p className="mt-2 text-sm text-amber-300">
+          Use the system price: a discretionary discount or market reaction by an associate does not move the KTT
+          into a lower price band.
         </p>
 
         <div className="overflow-x-auto">
@@ -135,7 +154,7 @@ function App() {
     laptopPrice: 1299,
     deviceType: 'pc',
     termMonths: 36,
-    adminFee: 130,
+    adminFee: ADMIN_FEE,
     isMember: false,
     protectionPlan: 'none',
     protectionCost: 0,
@@ -267,7 +286,7 @@ function App() {
             <h2 className="text-2xl font-semibold">Adjust your terms</h2>
             <div className="mt-6 grid gap-4">
               <InputField
-                label="Device price"
+                label="Device price (system price)"
                 value={form.laptopPrice}
                 onChange={handleChange('laptopPrice')}
                 min="0"
@@ -278,18 +297,21 @@ function App() {
                 <span className="mb-2 block text-sm font-medium text-slate-300">Device type</span>
                 <select
                   value={form.deviceType}
-                  onChange={(e) =>
-                    setForm((p) => ({
-                      ...p,
-                      deviceType: e.target.value,
-                      adminFee: DEFAULT_ADMIN_FEES[e.target.value],
-                    }))
-                  }
+                  onChange={(e) => setForm((p) => ({ ...p, deviceType: e.target.value }))}
                   className="w-full rounded-2xl border border-slate-700 bg-slate-900/70 px-4 py-3 text-white outline-none"
                 >
                   <optgroup label="Laptop">
                     <option value="pc">PC Laptop</option>
                     <option value="mac">Apple MacBook</option>
+                  </optgroup>
+                  <optgroup label="Desktop">
+                    <option value="desktop-pc">PC Desktop</option>
+                    <option value="desktop-apple">Apple Desktop</option>
+                  </optgroup>
+                  <optgroup label="Tablet">
+                    <option value="tablet-surface">Microsoft Surface</option>
+                    <option value="tablet-samsung">Samsung Galaxy Tab</option>
+                    <option value="tablet-ipad">Apple iPad</option>
                   </optgroup>
                   <optgroup label="Mobile">
                     <option value="mobile-apple">Apple iPhone</option>

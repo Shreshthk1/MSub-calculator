@@ -4,9 +4,15 @@ function toNumber(value) {
 }
 // KTT tiers: [minimum price, KTT amount], highest band first.
 // Devices priced below the lowest band are not eligible for KTT.
+// KTT is based on the system price; associate discounts don't move it to a lower band.
 export const KTT_TABLES = {
-  pc: [[2000, 200], [1500, 200], [500, 150]],
-  mac: [[2000, 600], [1500, 500], [500, 400]],
+  pc: [[2000, 200], [1500, 200], [1000, 150], [500, 150]],
+  mac: [[2000, 600], [1500, 500], [1000, 400], [500, 200]],
+  'desktop-pc': [[2000, 300], [1500, 250], [1000, 150], [500, 150]],
+  'desktop-apple': [[2000, 500], [1500, 400], [1000, 300], [500, 200]],
+  'tablet-surface': [[2000, 250], [1500, 200], [1000, 150], [500, 100]],
+  'tablet-samsung': [[2000, 350], [1500, 200], [1000, 150], [500, 100]],
+  'tablet-ipad': [[2000, 500], [1500, 400], [1000, 300], [500, 150]],
   'mobile-apple': [[2500, 600], [2000, 600], [1750, 500], [1500, 400], [1250, 350], [1000, 300], [750, 200]],
   'mobile-samsung': [[2500, 400], [2000, 350], [1750, 300], [1500, 250], [1250, 200], [1000, 150], [750, 100]],
   'mobile-google': [[2500, 400], [2000, 350], [1750, 300], [1500, 250], [1250, 200], [1000, 150], [750, 100]],
@@ -14,15 +20,7 @@ export const KTT_TABLES = {
   'watch-samsung': [[1000, 250], [750, 150], [500, 100]],
 }
 
-export const DEFAULT_ADMIN_FEES = {
-  pc: 130,
-  mac: 130,
-  'mobile-apple': 129.99,
-  'mobile-samsung': 129.99,
-  'mobile-google': 129.99,
-  'watch-apple': 129.99,
-  'watch-samsung': 129.99,
-}
+export const ADMIN_FEE = 129.99
 
 export function getKttAmount(price, deviceType) {
   const p = toNumber(price)
