@@ -78,6 +78,17 @@ describe('calculateLease', () => {
     expect(getKttAmount(1999.99, 'tablet-surface')).toBe(200)
   })
 
+  it('applies gaming console KTT by brand and price band', () => {
+    expect(getKttAmount(499.99, 'console-sony')).toBe(0)
+    expect(getKttAmount(500, 'console-microsoft')).toBe(150)
+    expect(getKttAmount(799.99, 'console-sony')).toBe(150)
+    expect(getKttAmount(899, 'console-sony')).toBe(300)
+    expect(getKttAmount(1099.99, 'console-nintendo')).toBe(200)
+    expect(getKttAmount(1100, 'console-microsoft')).toBe(250)
+    expect(getKttAmount(1300, 'console-sony')).toBe(400)
+    expect(getKttAmount(1300, 'console-nintendo')).toBe(250)
+  })
+
   it('shows total savings when the 36-month total is less than the laptop price', () => {
     render(<App />)
 

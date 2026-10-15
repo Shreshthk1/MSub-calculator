@@ -74,6 +74,14 @@ const KTT_SECTIONS = [
       { key: 'watch-samsung', label: 'Samsung' },
     ],
   },
+  {
+    title: 'Gaming Consoles (36 months)',
+    columns: [
+      { key: 'console-microsoft', label: 'Microsoft' },
+      { key: 'console-sony', label: 'Sony' },
+      { key: 'console-nintendo', label: 'Nintendo' },
+    ],
+  },
 ]
 
 function formatBand(minimum, nextMinimum) {
@@ -325,6 +333,11 @@ function App() {
                   <optgroup label="Smart Watch">
                     <option value="watch-apple">Apple Watch</option>
                     <option value="watch-samsung">Samsung watch</option>
+                  </optgroup>
+                  <optgroup label="Gaming Console">
+                    <option value="console-microsoft">Microsoft Xbox</option>
+                    <option value="console-sony">Sony PlayStation</option>
+                    <option value="console-nintendo">Nintendo Switch</option>
                   </optgroup>
                 </select>
               </label>
